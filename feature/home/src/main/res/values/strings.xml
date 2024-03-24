@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">home</string>
+
+    <string name="home_trending_now">Trending now</string>
+    <string name="home_popular_this_season">Popular this season</string>
+    <string name="home_upcoming_next_season">Upcoming next season</string>
+    <string name="home_all_time_popular">All time popular</string>
+    <string name="home_top_ten">Top 10</string>
+
+</resources>

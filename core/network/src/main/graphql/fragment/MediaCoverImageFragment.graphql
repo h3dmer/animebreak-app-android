@@ -1,0 +1,8 @@
+fragment MediaCoverImageFragment on Media {
+    coverImage {
+        extraLarge
+        large
+        medium
+        color
+    }
+}

@@ -1,0 +1,56 @@
+query HomeAnimeQuery(
+    $currentSeason: MediaSeason,
+    $currentSeasonYear: Int,
+    $upcomingSeason: MediaSeason,
+    $upcomingSeasonYear: Int
+) {
+    trendingNow: Page(page: 1, perPage: 10) {
+        media(
+            format: TV,
+            type: ANIME,
+            sort: [TRENDING_DESC]
+        ) {
+            ...BasicMediaDetailsFragment
+        }
+    }
+    popularThisSeason: Page(page: 1, perPage: 10) {
+        media(
+            format: TV,
+            type: ANIME,
+            sort: [POPULARITY_DESC],
+            season: $currentSeason
+            seasonYear: $currentSeasonYear
+        ) {
+            ...BasicMediaDetailsFragment
+        }
+    }
+    upcomingNextSeason: Page(page: 1, perPage: 10) {
+        media(
+            format: TV,
+            type: ANIME,
+            sort: [POPULARITY_DESC],
+            season: $upcomingSeason
+            seasonYear: $upcomingSeasonYear
+        ) {
+            ...BasicMediaDetailsFragment
+        }
+    }
+    allTimePopular: Page(page: 1, perPage: 10) {
+        media(
+            format: TV,
+            type: ANIME,
+            sort: [POPULARITY_DESC]
+        ) {
+            ...BasicMediaDetailsFragment
+        }
+    }
+    top10: Page(page: 1, perPage: 10) {
+        media(
+            format: TV,
+            type: ANIME,
+            sort: [SCORE_DESC]
+        ) {
+            ...BasicMediaDetailsFragment
+        }
+    }
+}

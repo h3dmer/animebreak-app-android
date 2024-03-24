@@ -1,0 +1,34 @@
+query SearchMediaQuery(
+    $search: String!,
+    $page: Int!,
+) {
+    Page(page: $page) {
+        pageInfo {
+            total
+            perPage
+            currentPage
+            lastPage
+            hasNextPage
+        }
+        media(
+            search: $search,
+            sort: [SEARCH_MATCH]
+        ) {
+            id
+            type
+            coverImage {
+                extraLarge
+            }
+            title {
+                romaji
+                english
+                native
+            }
+            averageScore
+            season
+            seasonYear
+            format
+            episodes
+        }
+    }
+}

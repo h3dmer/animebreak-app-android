@@ -1,0 +1,11 @@
+fragment BasicMediaDetailsFragment on Media {
+    id
+    title {
+        english
+        native
+        userPreferred
+    }
+    ...MediaCoverImageFragment
+    bannerImage
+    averageScore
+}
