@@ -2,7 +2,6 @@ package com.hedmer.anibreak.core.database.dao
 
 import androidx.room.Dao
 import androidx.room.Query
-import androidx.room.Transaction
 import androidx.room.Upsert
 import com.hedmer.anibreak.core.database.model.HomeMediaEntity
 import kotlinx.coroutines.flow.Flow
@@ -17,10 +16,4 @@ internal interface HomeMediaDao {
   fun getHomeMedia(
     id: Int = HomeMediaEntity.FIRST_RECORD_ID
   ): Flow<HomeMediaEntity?>
-
-//  @Transaction
-//  suspend fun updateAndReturnHomeMedia(homeMediaEntity: HomeMediaEntity): HomeMediaEntity {
-//    upsertHomeMedia(homeMediaEntity)
-//    return getHomeMedia()
-//  }
 }

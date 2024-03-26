@@ -23,22 +23,10 @@ internal class DatabaseHomeDataSource @Inject constructor(
     return dao.getHomeMedia()
       .map { it?.homeMedia }
   }
-
-//  override suspend fun upsertAndReturnHomeMedia(
-//    homeMedia: HomeMedia
-//  ): HomeMedia {
-//    return dao.updateAndReturnHomeMedia(
-//      HomeMediaEntity(
-//        homeMedia = homeMedia
-//      )
-//    ).homeMedia
-//  }
 }
 
 interface DBHomeDataSource {
 
   suspend fun upsertHomeMedia(homeMedia: HomeMedia)
   fun getHomeMedia(): Flow<HomeMedia?>
-//  suspend fun upsertAndReturnHomeMedia(homeMedia: HomeMedia): HomeMedia
 }
-
