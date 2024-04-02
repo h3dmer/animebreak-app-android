@@ -15,6 +15,7 @@ import com.hedmer.anibreak.model.SearchBasicMedia
 import com.hedmer.anibreak.domain.repository.SearchRepository
 import com.hedmer.anibreak.model.search.RecentLocalSearches
 import com.hedmer.anibreak.model.search.RecentSearchQuery
+import com.hedmer.anibreak.model.search.SearchParam
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -36,11 +37,10 @@ class SearchDefaultRepository @Inject constructor(
   override val totalCountsFlow: StateFlow<Int?> = _totalCountsFlow.asStateFlow()
 
   override fun searchMedia(
-    page: Int,
-    query: String
+    searchParam: SearchParam
   ): Flow<PagingData<SearchBasicMedia>> {
 
-    val pagingSource = SearchMediaPagingSource(apiClient, query, PAGE_SIZE) {
+    val pagingSource = SearchMediaPagingSource(apiClient, searchParam) {
        _totalCountsFlow.value = it
     }
     val config = PagingConfig(PAGE_SIZE)

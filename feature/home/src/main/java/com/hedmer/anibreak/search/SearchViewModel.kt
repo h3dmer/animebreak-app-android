@@ -7,13 +7,20 @@ import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.hedmer.anibreak.model.SearchBasicMedia
 import com.hedmer.anibreak.domain.repository.SearchRepository
+import com.hedmer.anibreak.search.filter.SearchFilters
 import com.hedmer.anibreak.model.search.RecentLocalSearches
+import com.hedmer.anibreak.model.search.SearchResult
+import com.hedmer.anibreak.model.search.toParams
+import com.hedmer.anibreak.search.data.FiltersHolder
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flatMapLatest
@@ -24,31 +31,44 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SearchViewModel @Inject constructor(
+  filterHolder: FiltersHolder,
   private val savedStateHandle: SavedStateHandle,
   private val searchRepository: SearchRepository
 ) : ViewModel() {
-
-  private val searchQuery: StateFlow<String> = fromStateHandle()
 
   private val _uiState: MutableStateFlow<SearchUiState> =
     MutableStateFlow(SearchUiState.EmptyQuery)
   val uiState: StateFlow<SearchUiState> = _uiState.asStateFlow()
 
+  val searchQuery: StateFlow<String> = fromStateHandle()
+
   val totalItemsCount: StateFlow<Int?> =
     searchRepository.totalCountsFlow.stateIn()
+
+  val filters: StateFlow<SearchFilters> =
+    filterHolder.filters
+      .stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5_000),
+        SearchFilters.Empty
+      )
 
   val recentSearchers: StateFlow<RecentLocalSearches?> =
     searchRepository
       .fetchLocalRecentSearches()
       .stateIn()
 
+  @OptIn(FlowPreview::class)
   val searchResults: Flow<PagingData<SearchBasicMedia>> =
-    searchQuery
-      .filter(::atLeastOneLetter)
+    combine(searchQuery, filters) { query, search ->
+      SearchResult(query, search.filters)
+    }
+      .filter { search -> search.query.trim().isNotEmpty() }
+      .debounce(700L)
       .distinctUntilChanged()
-      .flatMapLatest { query ->
+      .flatMapLatest { searchParam ->
         _uiState.value = SearchUiState.Loading
-        searchRepository.searchMedia(1, query)
+        searchRepository.searchMedia(searchParam.toParams())
           .mapLatest { mediaResults ->
             _uiState.value = SearchUiState.Success()
             mediaResults
@@ -56,8 +76,12 @@ class SearchViewModel @Inject constructor(
           .cachedIn(viewModelScope)
       }
 
+  fun onSearchQueryChange(query: String) {
+    savedStateHandle[SEARCH_QUERY_STATE_KEY] = query
+  }
+
   fun onSearchTriggered(query: String) {
-    if (atLeastOneLetter(query)) {
+    if (query.trim().isNotEmpty()) {
       viewModelScope.launch {
         searchRepository.upsertRecentSearchQuery(query)
       }
@@ -87,10 +111,6 @@ class SearchViewModel @Inject constructor(
     _uiState.value = SearchUiState.EmptyQuery
   }
 
-  private fun atLeastOneLetter(query: String): Boolean {
-    return query.trim().length >= SEARCH_QUERY_MIN_LENGTH
-  }
-
   private fun fromStateHandle(): StateFlow<String> {
     return savedStateHandle.getStateFlow(
       key = SEARCH_QUERY_STATE_KEY, initialValue = ""
@@ -107,6 +127,5 @@ class SearchViewModel @Inject constructor(
 
   private companion object {
     const val SEARCH_QUERY_STATE_KEY = "searchQuery"
-    const val SEARCH_QUERY_MIN_LENGTH = 1
   }
 }

@@ -7,6 +7,7 @@ import com.apollographql.apollo3.api.Operation
 import com.apollographql.apollo3.api.Optional
 import com.hedmer.anibreak.common.error.MissingDataException
 import com.hedmer.anibreak.common.error.ResponseError
+import com.hedmer.anibreak.core.network.model.SearchRequestParam
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
@@ -46,16 +47,20 @@ class AnibreakGraphqlClient @Inject constructor(
   }
 
   suspend fun searchMedia(
-    page: Int,
-    perPage: Int,
-    searchQuery: String
+    searchParam: SearchRequestParam
   ): ApolloResponse<SearchMediaQuery.Data> {
-    return client.query(
-      SearchMediaQuery(
-        page = page,
-        search = searchQuery
-      )
-    ).execute()
+    return with(searchParam) {
+      client.query(
+        SearchMediaQuery(
+          page = page,
+          search = query,
+          mediaType = Optional.presentIfNotNull(type),
+          season = Optional.presentIfNotNull(season),
+          format = Optional.presentIfNotNull(format),
+          seasonYear = Optional.presentIfNotNull(year),
+        )
+      ).execute()
+    }
   }
 }
 

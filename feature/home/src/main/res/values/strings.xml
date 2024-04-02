@@ -7,4 +7,9 @@
     <string name="home_all_time_popular">All time popular</string>
     <string name="home_top_ten">Top 10</string>
 
+    <string name="search_filter_media_type">Media type</string>
+    <string name="search_filter_media_season">Season</string>
+    <string name="search_filter_media_format">Format</string>
+    <string name="search_filter_media_year">Year</string>
+
 </resources>

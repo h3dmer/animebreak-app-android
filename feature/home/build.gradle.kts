@@ -18,6 +18,7 @@ dependencies {
   implementation(projects.core.common)
   implementation(projects.core.commonUi)
   implementation(projects.core.domain)
+  implementation(projects.core.model)
   implementation(projects.core.navigation)
 
   implementation(libs.androidx.lifecycle.runtimeCompose)
@@ -33,10 +34,6 @@ dependencies {
   implementation(libs.androidx.paging.compose)
   implementation(libs.lottie.compose)
 
-//  implementation(libs.androidx.worker)
-////  implementation(libs.viewmodel.lifecycle)
-//  implementation(libs.hilt.worker)
-
   implementation(projects.core.testing)
   testImplementation(libs.androidx.test.rules)
   testImplementation(libs.androidx.test.core)
@@ -45,7 +42,5 @@ dependencies {
   testImplementation(libs.truth)
   testImplementation(libs.mockk.test)
   testImplementation("app.cash.turbine:turbine:1.1.0")
-
-
 
 }

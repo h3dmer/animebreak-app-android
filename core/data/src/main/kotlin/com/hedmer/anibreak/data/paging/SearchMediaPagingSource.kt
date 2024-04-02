@@ -3,10 +3,12 @@ package com.hedmer.anibreak.data.paging
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.hedmer.anibreak.core.network.client.AnibreakGraphqlClient
+import com.hedmer.anibreak.data.mappers.toRequestParam
 import com.hedmer.anibreak.model.AnibreakMediaType
 import com.hedmer.anibreak.model.MediaSeason
 import com.hedmer.anibreak.model.MediaTitle
 import com.hedmer.anibreak.model.SearchBasicMedia
+import com.hedmer.anibreak.model.search.SearchParam
 import query.SearchMediaQuery
 
 private const val STARTING_PAGE_INDEX = 1
@@ -14,15 +16,14 @@ private const val ITEMS_PER_PAGE = 30
 
 class SearchMediaPagingSource(
   private val client: AnibreakGraphqlClient,
-  private val query: String,
-  private val pageSize: Int,
+  private val searchParam: SearchParam,
   private val totalCounts: (Int?) -> Unit
 ) : PagingSource<Int, SearchMediaQuery.Medium>() {
 
   override suspend fun load(params: LoadParams<Int>): LoadResult<Int, SearchMediaQuery.Medium> {
     val pageNumber = params.key ?: STARTING_PAGE_INDEX
     return try {
-      val response = client.searchMedia(pageNumber, ITEMS_PER_PAGE, query)
+      val response = client.searchMedia(searchParam.toRequestParam())
       val page = response.data?.Page?.pageInfo
       response.data?.Page?.media?.filterNotNull()?.let { mediaList ->
         totalCounts(page?.total)

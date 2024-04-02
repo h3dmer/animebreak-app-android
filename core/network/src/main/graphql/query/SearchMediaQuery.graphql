@@ -1,6 +1,10 @@
 query SearchMediaQuery(
-    $search: String!,
     $page: Int!,
+    $search: String!,
+    $mediaType: MediaType,
+    $season: MediaSeason,
+    $format: MediaFormat,
+    $seasonYear: Int
 ) {
     Page(page: $page) {
         pageInfo {
@@ -12,7 +16,11 @@ query SearchMediaQuery(
         }
         media(
             search: $search,
-            sort: [SEARCH_MATCH]
+            sort: [SEARCH_MATCH],
+            type: $mediaType,
+            season: $season,
+            format: $format,
+            seasonYear: $seasonYear,
         ) {
             id
             type
